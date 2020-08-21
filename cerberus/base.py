@@ -1318,6 +1318,7 @@ class UnconcernedValidator(metaclass=ValidatorMeta):
         schema: Optional[Schema] = None,
         update: bool = False,
         normalize: bool = True,
+        normalize_after: bool = False,
     ) -> bool:
         """
         Normalizes and validates a mapping against a validation-schema of defined rules.
@@ -1327,6 +1328,7 @@ class UnconcernedValidator(metaclass=ValidatorMeta):
                        here, the schema must have been provided at class instantiation.
         :param update: If ``True``, required fields won't be checked.
         :param normalize: If ``True``, normalize the document before validation.
+        :param normalize: If ``True``, normalize the document after validation.
         :return: ``True`` if validation succeeds, otherwise ``False``. Check
                  the :func:`errors` property for a list of processing errors.
         """
@@ -1348,6 +1350,9 @@ class UnconcernedValidator(metaclass=ValidatorMeta):
 
         if not self.update:
             self.__validate_required_fields(self.document)
+
+        if normalize_after:
+            self.document = self.__normalize_mapping(self.document, self.schema)
 
         self.error_handler.end(self)
         self._errors.sort()
